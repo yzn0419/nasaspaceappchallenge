@@ -3,7 +3,9 @@ import numpy as np
 import pandas as pd
 import tensorflow as tf
 from tensorflow.keras.models import load_model
-from exoplanet import normalize, pad_or_trim  # reuse functions from exoplanet.py
+import exoplanet
+normalize = exoplanet.normalize
+pad_or_trim = exoplanet.pad_or_trim
 
 # Load pre-trained model
 MODEL_PATH = "models/final_model.h5"
@@ -32,3 +34,4 @@ if uploaded_file is not None:
     st.subheader("Prediction")
     st.write(f"Confidence: {pred:.3f}")
     st.success(label if pred > 0.5 else label)
+
