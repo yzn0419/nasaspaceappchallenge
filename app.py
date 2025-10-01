@@ -11,7 +11,7 @@ pad_or_trim = exoplanet.pad_or_trim
 MODEL_PATH = "models/final_model.h5"
 model = load_model(MODEL_PATH)
 
-st.title("🚀 Exoplanet Detector (Hackathon Demo)")
+st.title("🚀 Exoplanet Detector (ASID Robotics)")
 st.write("Upload a light curve file (CSV with a single flux column) to detect possible exoplanet transits.")
 
 uploaded_file = st.file_uploader("Upload light curve CSV", type=["csv"])
@@ -34,4 +34,5 @@ if uploaded_file is not None:
     st.subheader("Prediction")
     st.write(f"Confidence: {pred:.3f}")
     st.success(label if pred > 0.5 else label)
+
 
