@@ -196,5 +196,9 @@ def main_smoke_test():
     model.save('models/final_model.h5')
     print("Saved model to models/final_model.h5")
 
+normalize = normalize_flux
+pad_or_trim = _pad_or_trim
+
 if __name__ == "__main__":
     main_smoke_test()
+
