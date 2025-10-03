@@ -31,27 +31,40 @@ if uploaded_file is not None:
     # Normalize flux for clearer dips
     flux_norm = flux / np.nanmedian(flux)
 
-    # --- Interactive slider for zooming ---
+    # --- Slider to select time window in DAYS ---
     min_time, max_time = float(np.nanmin(time)), float(np.nanmax(time))
     start, end = st.slider(
-        "Select time window to zoom",
-        min_value=min_time,
-        max_value=max_time,
-        value=(min_time, min_time + (max_time - min_time) * 0.1)  # default first 10% of data
+        "Select time window (days)",
+        min_value=int(min_time),
+        max_value=int(max_time),
+        value=(int(min_time), int(min_time) + 10),  # default = 10-day window
+        step=1
     )
 
-    # Apply time mask based on slider
+    # --- Button to auto-zoom into deepest flux dip ---
+    auto_zoom = st.button("🔎 Auto Zoom to Deepest Transit")
+    if auto_zoom:
+        dip_index = np.nanargmin(flux_norm)  # index of deepest dip
+        dip_time = time[dip_index]
+        # center window ~5 days around dip
+        start, end = int(dip_time) - 5, int(dip_time) + 5
+        if start < min_time:
+            start = int(min_time)
+        if end > max_time:
+            end = int(max_time)
+
+    # Apply time mask
     mask = (time >= start) & (time <= end)
     time_zoom = time[mask]
     flux_zoom = flux_norm[mask]
 
-    # Plot with matplotlib for better control
+    # Plot with matplotlib
     st.subheader("Light Curve (Zoomable)")
     fig, ax = plt.subplots(figsize=(10, 5))
     ax.scatter(time_zoom, flux_zoom, s=2, color="blue")
     ax.set_xlabel("Time (BJD - 2457000)")
     ax.set_ylabel("Normalized Flux")
-    ax.set_title(f"Light Curve (Time {start:.1f} - {end:.1f})")
+    ax.set_title(f"Light Curve (Time {start} - {end} days)")
     st.pyplot(fig)
 
     # Prediction (using original flux only, not zoomed)
@@ -68,6 +81,8 @@ if uploaded_file is not None:
         st.success(label)
     else:
         st.error(label)
+
+
 
 
 
