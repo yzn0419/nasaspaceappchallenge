@@ -18,22 +18,18 @@ st.markdown(
 
     /* Also fix buttons and inputs so text stays visible */
     .stButton>button {
-        color: white !important;
+        color: black !important;
     }
     input, textarea {
-        color: white !important;
+        color: black !important;
     }
     </style>
     """,
     unsafe_allow_html=True
 )
 
-# Example UI
-st.title("🌌 Exoplanet Detector")
-st.write("Now the text is white, but the background stays the same.")
-
-st.title("🚀 Exoplanet Detector by ASID Robotics")
-st.write("Upload a light curve file to detect possible exoplanet transits.")
+st.title("🌌Exovision")
+st.write("Upload a light curve file (CSV with a single flux column) to detect possible exoplanet transits.")
 # ==== BACKGROUND SETUP ====
 def get_base64(bin_file):
     with open(bin_file, 'rb') as f:
@@ -61,9 +57,6 @@ set_background("pexels-umkreisel-app-957010.jpg")
 MODEL_PATH = "models/final_model.h5"
 model = load_model(MODEL_PATH)
 
-st.title("🚀 Exoplanet Detector (Hackathon Demo)")
-st.write("Upload a light curve file (CSV with a single flux column) to detect possible exoplanet transits.")
-
 
 
 uploaded_file = st.file_uploader("Upload light curve CSV", type=["csv"])
@@ -86,6 +79,7 @@ if uploaded_file is not None:
     st.subheader("Prediction")
     st.write(f"Confidence: {pred:.3f}")
     st.success(label if pred > 0.5 else label)
+
 
 
 
