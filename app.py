@@ -33,6 +33,31 @@ def set_background(image_file):
 # Call it here (make sure the file exists in the repo!)
 set_background("Untitled design.jpg")
 
+st.markdown(
+    """
+    <style>
+    /* Force all text to white */
+    .stApp, .stMarkdown, .stText, .stTitle, .stHeader, .stSubheader,
+    .stCaption, div, span, p {
+        color: black !important;
+    }
+
+    /* File uploader box styling */
+    .stFileUploader > div {
+        background-color: black !important;
+        border: 2px dashed black !important;
+        color: black !important;
+    }
+
+    /* File uploader caption text */
+    .stFileUploader label {
+        color: black !important;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
 # Load pre-trained model
 MODEL_PATH = "models/final_model.h5"
 model = load_model(MODEL_PATH)
@@ -108,6 +133,7 @@ if uploaded_file is not None:
         st.success(label)
     else:
         st.error(label)
+
 
 
 
