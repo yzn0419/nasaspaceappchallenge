@@ -4,16 +4,15 @@ import pandas as pd
 import tensorflow as tf
 import matplotlib.pyplot as plt
 from tensorflow.keras.models import load_model
-from exoplanet import normalize, pad_or_trim  # reuse functions from exoplanet.py
-import streamlit as st
+from exoplanet import normalize, pad_or_trim
 import base64
 
-# Function to convert image to base64
+# --- Function to convert image to base64 ---
 def get_base64(bin_file):
     with open(bin_file, "rb") as f:
         return base64.b64encode(f.read()).decode()
 
-# Function to set custom background
+# --- Function to set custom background ---
 def set_background(image_file):
     bin_str = get_base64(image_file)
     page_bg_img = f"""
@@ -30,145 +29,88 @@ def set_background(image_file):
     """
     st.markdown(page_bg_img, unsafe_allow_html=True)
 
+# Set background image
 set_background("Untitled design (5).jpg")
 
+# --- Load model ---
 MODEL_PATH = "models/final_model.h5"
 model = load_model(MODEL_PATH)
 
-st.title("🌌Exovision")
+# --- Title ---
+st.title("🌌 Exovision")
 st.write("Upload a light curve file (CSV with time + flux columns) to detect possible exoplanet transits.")
 
-import streamlit as st
+# --- Custom styled uploader box ---
+st.markdown("""
+<style>
+div[data-testid="stFileUploaderDropzone"] {
+    background-color: #0b274a !important;   /* dark blue background */
+    border: 3px dashed #4fc3f7 !important;  /* cyan border */
+    border-radius: 12px !important;
+    padding: 40px !important;
+    color: white !important;
+}
+div[data-testid="stFileUploaderDropzone"] p {
+    color: white !important;   /* caption text white */
+    font-size: 18px !important;
+    font-family: 'Poppins', sans-serif;
+}
+</style>
+""", unsafe_allow_html=True)
 
-st.markdown(
-    """
-    <style>
-    /* Dropzone background and border */
-    div[data-testid="stFileUploaderDropzone"],
-    section[data-testid="stFileUploader"] div[role="button"],
-    div[data-testid="stFileUploader"] div[role="button"],
-    .stFileUploader div[role="button"] {
-        background-color: #0b274a !important;  /* dark blue */
-        border: 2px dashed rgba(255,255,255,0.9) !important;
-        border-radius: 10px !important;
-        padding: 14px !important;
-    }
-
-    /* Force most inner text in the dropzone to white */
-    div[data-testid="stFileUploaderDropzone"] * ,
-    section[data-testid="stFileUploader"] div[role="button"] * ,
-    .stFileUploader div[role="button"] * {
-        color: #ffffff !important;
-    }
-
-    /* Keep caption text (stCaption) black */
-    .stCaption {
-        color: black !important;
-    }
-    </style>
-
-    <script>
-    (function() {
-        const selectors = [
-            'div[data-testid="stFileUploaderDropzone"]',
-            'section[data-testid="stFileUploader"] div[role="button"]',
-            'div[data-testid="stFileUploader"] div[role="button"]',
-            '.stFileUploader div[role="button"]'
-        ];
-
-        function applyStylesOnce() {
-            selectors.forEach(sel => {
-                document.querySelectorAll(sel).forEach(drop => {
-                    // style container
-                    drop.style.backgroundColor = '#0b274a';
-                    drop.style.border = '2px dashed rgba(255,255,255,0.9)';
-                    drop.style.borderRadius = '10px';
-                    drop.style.padding = '14px';
-                    // style inner text nodes (prefer white)
-                    drop.querySelectorAll('p, span, label, strong, em, button, div').forEach(n => {
-                        if (n && n.classList && n.classList.contains('stCaption')) {
-                            // keep caption black
-                            n.style.color = 'black';
-                        } else {
-                            n.style.color = '#fff';
-                        }
-                    });
-                });
-            });
-        }
-
-        // Retry a few times and observe DOM changes (Streamlit renders async)
-        applyStylesOnce();
-        let attempts = 0;
-        const interval = setInterval(() => {
-            applyStylesOnce();
-            attempts += 1;
-            if (attempts > 20) clearInterval(interval);
-        }, 300);
-
-        const observer = new MutationObserver(() => applyStylesOnce());
-        observer.observe(document.body, { childList: true, subtree: true });
-    })();
-    </script>
-    """,
-    unsafe_allow_html=True,
-)
-
+# --- File uploader (works normally) ---
 uploaded_file = st.file_uploader("Upload light curve CSV", type=["csv"])
 
+# --- Process uploaded file ---
 if uploaded_file is not None:
-    # Load uploaded file
     df = pd.read_csv(uploaded_file)
 
-    # Check if file has time + flux or just flux
     if "time" in df.columns and "flux" in df.columns:
         time = df["time"].values
         flux = df["flux"].values
     else:
-        # fallback if only flux column exists
         time = np.arange(len(df))
         flux = df.iloc[:, 0].values
 
-    # Normalize flux for clearer dips
+    # Normalize flux
     flux_norm = flux / np.nanmedian(flux)
 
-    # --- Slider to select time window in DAYS ---
+    # --- Time window slider ---
     min_time, max_time = float(np.nanmin(time)), float(np.nanmax(time))
     start, end = st.slider(
         "Select time window (days)",
         min_value=int(min_time),
         max_value=int(max_time),
-        value=(int(min_time), int(min_time) + 10),  # default = 10-day window
+        value=(int(min_time), int(min_time) + 10),
         step=1
     )
 
-    # --- Button to auto-zoom into deepest flux dip ---
+    # --- Auto zoom button ---
     auto_zoom = st.button("🔎 Auto Zoom to Deepest Transit")
     if auto_zoom:
-        dip_index = np.nanargmin(flux_norm)  # index of deepest dip
+        dip_index = np.nanargmin(flux_norm)
         dip_time = time[dip_index]
-        # center window ~5 days around dip
         start, end = int(dip_time) - 5, int(dip_time) + 5
         if start < min_time:
             start = int(min_time)
         if end > max_time:
             end = int(max_time)
 
-    # Apply time mask
+    # --- Apply mask ---
     mask = (time >= start) & (time <= end)
     time_zoom = time[mask]
     flux_zoom = flux_norm[mask]
 
-    # Plot with matplotlib
+    # --- Plot light curve ---
     st.subheader("Light Curve (Zoomable)")
     fig, ax = plt.subplots(figsize=(10, 5))
-    ax.scatter(time_zoom, flux_zoom, s=2, color="blue")
+    ax.scatter(time_zoom, flux_zoom, s=2, color="cyan")
     ax.set_xlabel("Time (BJD - 2457000)")
     ax.set_ylabel("Normalized Flux")
     ax.set_title(f"Light Curve (Time {start} - {end} days)")
     st.pyplot(fig)
 
-    # Prediction (using original flux only, not zoomed)
+    # --- Prediction ---
     flux_input = pad_or_trim(flux, 2048)
     flux_input = flux_input[np.newaxis, :, np.newaxis].astype(np.float32)
     flux_input = normalize(flux_input)
@@ -182,6 +124,8 @@ if uploaded_file is not None:
         st.success(label)
     else:
         st.error(label)
+
+
 
 
 
