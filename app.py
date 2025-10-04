@@ -57,7 +57,7 @@ def set_background(jpg_file):
     )
 
 # Call background function with your image
-set_background("exovisionbackground.jpg")
+set_background("exovisionbg.jpg")
 
 MODEL_PATH = "models/final_model.h5"
 model = load_model(MODEL_PATH)
@@ -84,6 +84,7 @@ if uploaded_file is not None:
     st.subheader("Prediction")
     st.write(f"Confidence: {pred:.3f}")
     st.success(label if pred > 0.5 else label)
+
 
 
 
