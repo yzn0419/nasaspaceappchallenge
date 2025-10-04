@@ -37,12 +37,12 @@ set_background("Untitled design (1).jpg")
 st.markdown(
     """
     <style>
-    h1, h2, h3, h4, h5, h6 {
+    /* Make all text white */
+    h1, h2, h3, h4, h5, h6, p, div, span {
         color: white !important;
     }
-    .stMarkdown p {
-        color: white !important;
-    }
+
+    /* BUT keep uploader caption text black */
     .stCaption {
         color: black !important;
     }
@@ -50,6 +50,7 @@ st.markdown(
     """,
     unsafe_allow_html=True
 )
+
 
 # Load pre-trained model
 MODEL_PATH = "models/final_model.h5"
@@ -126,6 +127,7 @@ if uploaded_file is not None:
         st.success(label)
     else:
         st.error(label)
+
 
 
 
