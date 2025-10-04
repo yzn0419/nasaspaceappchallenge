@@ -37,12 +37,20 @@ set_background("Untitled design (1).jpg")
 st.markdown(
     """
     <style>
-    /* Make all text white */
+    /* General text white */
     h1, h2, h3, h4, h5, h6, p, div, span {
         color: white !important;
     }
 
-    /* BUT keep uploader caption text black */
+    /* File uploader drop zone (drag and drop box) */
+    div[data-testid="stFileUploaderDropzone"] {
+        background-color: #001f3f !important; /* dark blue */
+        border: 2px dashed white !important;  /* white border */
+        border-radius: 10px;
+        padding: 20px;
+    }
+
+    /* Caption inside uploader (e.g. 'Drag and drop file here') */
     .stCaption {
         color: black !important;
     }
@@ -50,6 +58,7 @@ st.markdown(
     """,
     unsafe_allow_html=True
 )
+
 
 
 # Load pre-trained model
@@ -127,6 +136,7 @@ if uploaded_file is not None:
         st.success(label)
     else:
         st.error(label)
+
 
 
 
