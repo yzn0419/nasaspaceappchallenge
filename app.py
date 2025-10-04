@@ -31,92 +31,35 @@ def set_background(image_file):
     st.markdown(page_bg_img, unsafe_allow_html=True)
 
 # Call it here (make sure the file exists in the repo!)
-set_background("Untitled design (1).jpg")
+set_background("Untitled design (2).jpg")
 
-
-# Robust CSS + JS to style the Streamlit file-uploader dropzone dark blue
-
+st.markdown("""
+<style>
+.stApp {
+    background-color: black;
+}
+.stTitle {
+    color: white;
+}
+.stHeader {
+    color: lightblue;
+}
+.stSubheader {
+    color: orange;
+}
+.stMarkdown, .stText, p, div {
+    color: white !important;
+}
+.stCaption {
+    color: black;
+}
+</style>
+""", unsafe_allow_html=True)
 
 
 # Load pre-trained model
 MODEL_PATH = "models/final_model.h5"
 model = load_model(MODEL_PATH)
-
-st.markdown(
-    """
-    <style>
-    /* Fallback CSS that may apply immediately */
-    div[data-testid="stFileUploaderDropzone"],
-    section[data-testid="stFileUploader"] div[role="button"],
-    .stFileUploader div[role="button"] {
-        background-color: #0b274a !important; /* dark blue */
-        border: 2px dashed rgba(255,255,255,0.9) !important;
-        border-radius: 10px !important;
-        padding: 16px !important;
-        color: #fff !important;
-    }
-
-    /* Keep the uploader caption (small helper text) black */
-    .stCaption {
-        color: black !important;
-    }
-    </style>
-
-    <script>
-    (function() {
-        const uploaderBg = '#0b274a'; // change to any hex
-        function applyStyles() {
-            // Try several selectors to find uploader containers (covers many Streamlit versions)
-            const containers = document.querySelectorAll(
-                'section[data-testid="stFileUploader"], div[data-testid="stFileUploader"], .stFileUploader'
-            );
-            containers.forEach(container => {
-                if (!container) return;
-                // prefer specific dropzone element if available
-                const drop = container.querySelector('div[role="button"], div[data-testid="stFileUploaderDropzone"]') || container.querySelector('div');
-                if (!drop) return;
-                // avoid reapplying
-                if (drop.classList.contains('__styled_by_script')) return;
-
-                drop.style.backgroundColor = uploaderBg;
-                drop.style.border = '2px dashed rgba(255,255,255,0.9)';
-                drop.style.borderRadius = '10px';
-                drop.style.padding = '16px';
-                drop.style.color = '#fff';
-                drop.classList.add('__styled_by_script');
-
-                // caption / helper text inside uploader
-                const caption = container.querySelector('.stCaption, label, p, span');
-                if (caption) caption.style.color = 'black';
-
-                // ensure inner text nodes useful for UX are visible
-                drop.querySelectorAll('span, p, div').forEach(n => {
-                    if (n && n.textContent && n.textContent.trim().length > 0) {
-                        // keep the caption black, others white
-                        if (caption && (n === caption || caption.contains(n))) {
-                            n.style.color = 'black';
-                        } else {
-                            n.style.color = '#fff';
-                        }
-                    }
-                });
-            });
-        }
-
-        // MutationObserver: re-apply whenever DOM changes (Streamlit renders async)
-        const obs = new MutationObserver(() => applyStyles());
-        obs.observe(document.body, { childList: true, subtree: true });
-
-        // initial attempts with delays
-        setTimeout(applyStyles, 200);
-        setTimeout(applyStyles, 800);
-        setTimeout(applyStyles, 1600);
-    })();
-    </script>
-    """,
-    unsafe_allow_html=True,
-)
-
 
 st.title("🌌Exovision")
 st.write("Upload a light curve file (CSV with time + flux columns) to detect possible exoplanet transits.")
@@ -189,6 +132,7 @@ if uploaded_file is not None:
         st.success(label)
     else:
         st.error(label)
+
 
 
 
