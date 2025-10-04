@@ -4,7 +4,30 @@ import pandas as pd
 import tensorflow as tf
 from tensorflow.keras.models import load_model
 from exoplanet import normalize, pad_or_trim  # reuse functions from exoplanet.py
+import base64
 
+# ==== BACKGROUND SETUP ====
+def get_base64(bin_file):
+    with open(bin_file, 'rb') as f:
+        data = f.read()
+    return base64.b64encode(data).decode()
+
+def set_background(jpg_file):
+    bin_str = get_base64(jpg_file)
+    st.markdown(
+        f"""
+        <style>
+        .stApp {{
+            background-image: url("data:image/jpg;base64,{bin_str}");
+            background-size: cover;
+            background-attachment: fixed;
+        }}
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+
+# Call background function with your image
 set_background("pexels-umkreisel-app-957010.jpg")
 
 MODEL_PATH = "models/final_model.h5"
@@ -35,6 +58,7 @@ if uploaded_file is not None:
     st.subheader("Prediction")
     st.write(f"Confidence: {pred:.3f}")
     st.success(label if pred > 0.5 else label)
+
 
 
 
