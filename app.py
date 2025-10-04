@@ -42,6 +42,10 @@ st.markdown(
         color: white !important;
     }
 
+     <style>
+    .stCaption {
+        color: black !important;
+
     /* File uploader box styling */
     .stFileUploader > div {
         background-color: black !important;
@@ -133,6 +137,7 @@ if uploaded_file is not None:
         st.success(label)
     else:
         st.error(label)
+
 
 
 
