@@ -1,6 +1,0 @@
-[theme]
-primaryColor = "#1E90FF"
-backgroundColor = "#000000"
-secondaryBackgroundColor = "#101010"
-textColor = "#FFFFFF"   # <-- this makes text white
-font = "sans serif"
