@@ -31,6 +31,20 @@ def set_background(image_file):
     st.markdown(page_bg_img, unsafe_allow_html=True)
 
 set_background("Untitled design (5).jpg")
+st.markdown("""
+<style>
+/* Drag and drop box */
+div[data-testid="stFileUploaderDropzone"] {
+    background-color: #001f3f; /* dark blue */
+    border: 2px dashed white;
+    border-radius: 10px;
+}
+/* Text inside the uploader */
+.stCaption {
+    color: white;
+}
+</style>
+""", unsafe_allow_html=True)
 
 
 MODEL_PATH = "models/final_model.h5"
@@ -107,6 +121,7 @@ if uploaded_file is not None:
         st.success(label)
     else:
         st.error(label)
+
 
 
 
