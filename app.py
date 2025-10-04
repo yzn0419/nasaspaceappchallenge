@@ -7,29 +7,74 @@ from exoplanet import normalize, pad_or_trim  # reuse functions from exoplanet.p
 import base64
 import streamlit as st
 
-# Force all text to white without changing background
+# Robust CSS + JS to style the drag & drop uploader box black
 st.markdown(
     """
     <style>
-    .stApp, .stMarkdown, .stText, .stTitle, .stHeader, .stSubheader,
-    .stCaption, .stDataFrame, div, span, p {
-        color: white !important;
+    /* Try many selectors so different Streamlit versions are covered */
+    section[data-testid="stFileUploader"] div[role="button"],
+    section[data-testid="stFileUploader"] div[role="button"] > div,
+    div[data-testid="stFileUploader"] div[role="button"],
+    .stFileUploader div[role="button"],
+    .stFileUploader {
+        background-color: rgba(0,0,0,0.95) !important;
+        border: 2px dashed rgba(255,255,255,0.9) !important;
+        color: #ffffff !important;
+        padding: 18px !important;
+        border-radius: 8px !important;
     }
 
-  /* File uploader box */
-    section[data-testid="st.file_uploader"] div[role="button"] {
-        background-color: black !important;
-        border: 2px dashed white !important;
-        color: white !important;
+    /* Uploader label / caption white */
+    section[data-testid="stFileUploader"] label,
+    div[data-testid="stFileUploader"] label,
+    .stFileUploader label {
+        color: #ffffff !important;
     }
-    input, textarea {
-        color: black !important;
+
+    /* Make sure the "browse files" text inside the uploader is white */
+    section[data-testid="stFileUploader"] span,
+    .stFileUploader span,
+    section[data-testid="stFileUploader"] p,
+    .stFileUploader p {
+        color: #ffffff !important;
     }
     </style>
-    """,
-    unsafe_allow_html=True
-)
 
+    <script>
+    // Retry loop: Streamlit renders asynchronously, so keep retrying until element exists
+    (function applyUploaderStyle(retries=0){
+        try {
+            const sel = document.querySelector('section[data-testid="stFileUploader"]') ||
+                        document.querySelector('div[data-testid="stFileUploader"]') ||
+                        document.querySelector('.stFileUploader');
+            if (!sel && retries < 20) {
+                setTimeout(()=> applyUploaderStyle(retries+1), 150);
+                return;
+            }
+            if (sel) {
+                const btn = sel.querySelector('div[role="button"]') || sel.querySelector('div');
+                if (btn) {
+                    btn.style.backgroundColor = 'rgba(0,0,0,0.95)';
+                    btn.style.border = '2px dashed rgba(255,255,255,0.9)';
+                    btn.style.color = '#fff';
+                    btn.style.padding = '18px';
+                    btn.style.borderRadius = '8px';
+                }
+                const label = sel.querySelector('label');
+                if (label) label.style.color = '#fff';
+                // ensure inner text nodes are white
+                sel.querySelectorAll('span, p, div').forEach(n => {
+                    n.style.color = '#fff';
+                });
+            }
+        } catch (e) {
+            if (retries < 20) setTimeout(()=> applyUploaderStyle(retries+1), 150);
+        }
+    })();
+    </script>
+    """,
+    unsafe_allow_html=True,
+)
 st.title("🌌Exovision")
 st.write("Upload a light curve file (CSV with a single flux column) to detect possible exoplanet transits.")
 # ==== BACKGROUND SETUP ====
@@ -81,6 +126,7 @@ if uploaded_file is not None:
     st.subheader("Prediction")
     st.write(f"Confidence: {pred:.3f}")
     st.success(label if pred > 0.5 else label)
+
 
 
 
