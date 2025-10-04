@@ -6,22 +6,7 @@ import matplotlib.pyplot as plt
 from tensorflow.keras.models import load_model
 from exoplanet import normalize, pad_or_trim  # reuse functions from exoplanet.py
 
-st.markdown(
-    """
-    <style>
-    .stApp {
-        background-image: url("Untitled design.jpg");
-        background-size: cover;
-        background-attachment: fixed;
-        color: white;
-    }
-    .css-1d391kg, .css-18e3th9, .css-10trblm, .stMarkdown, .stText, .stMetric, .stTitle {
-        color: white !important;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True
-)
+set_background("Untitled design.jpg")
 
 # Load pre-trained model
 MODEL_PATH = "models/final_model.h5"
@@ -98,6 +83,7 @@ if uploaded_file is not None:
         st.success(label)
     else:
         st.error(label)
+
 
 
 
