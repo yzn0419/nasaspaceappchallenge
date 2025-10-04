@@ -32,19 +32,87 @@ def set_background(image_file):
 
 set_background("Untitled design (5).jpg")
 
-st.markdown("""
-<style>
-div[data-testid="stFileUploaderDropzone"] p {
-    color: black !important;
-}
-</style>
-""", unsafe_allow_html=True)
-
 MODEL_PATH = "models/final_model.h5"
 model = load_model(MODEL_PATH)
 
 st.title("🌌Exovision")
 st.write("Upload a light curve file (CSV with time + flux columns) to detect possible exoplanet transits.")
+
+import streamlit as st
+
+st.markdown(
+    """
+    <style>
+    /* Dropzone background and border */
+    div[data-testid="stFileUploaderDropzone"],
+    section[data-testid="stFileUploader"] div[role="button"],
+    div[data-testid="stFileUploader"] div[role="button"],
+    .stFileUploader div[role="button"] {
+        background-color: #0b274a !important;  /* dark blue */
+        border: 2px dashed rgba(255,255,255,0.9) !important;
+        border-radius: 10px !important;
+        padding: 14px !important;
+    }
+
+    /* Force most inner text in the dropzone to white */
+    div[data-testid="stFileUploaderDropzone"] * ,
+    section[data-testid="stFileUploader"] div[role="button"] * ,
+    .stFileUploader div[role="button"] * {
+        color: #ffffff !important;
+    }
+
+    /* Keep caption text (stCaption) black */
+    .stCaption {
+        color: black !important;
+    }
+    </style>
+
+    <script>
+    (function() {
+        const selectors = [
+            'div[data-testid="stFileUploaderDropzone"]',
+            'section[data-testid="stFileUploader"] div[role="button"]',
+            'div[data-testid="stFileUploader"] div[role="button"]',
+            '.stFileUploader div[role="button"]'
+        ];
+
+        function applyStylesOnce() {
+            selectors.forEach(sel => {
+                document.querySelectorAll(sel).forEach(drop => {
+                    // style container
+                    drop.style.backgroundColor = '#0b274a';
+                    drop.style.border = '2px dashed rgba(255,255,255,0.9)';
+                    drop.style.borderRadius = '10px';
+                    drop.style.padding = '14px';
+                    // style inner text nodes (prefer white)
+                    drop.querySelectorAll('p, span, label, strong, em, button, div').forEach(n => {
+                        if (n && n.classList && n.classList.contains('stCaption')) {
+                            // keep caption black
+                            n.style.color = 'black';
+                        } else {
+                            n.style.color = '#fff';
+                        }
+                    });
+                });
+            });
+        }
+
+        // Retry a few times and observe DOM changes (Streamlit renders async)
+        applyStylesOnce();
+        let attempts = 0;
+        const interval = setInterval(() => {
+            applyStylesOnce();
+            attempts += 1;
+            if (attempts > 20) clearInterval(interval);
+        }, 300);
+
+        const observer = new MutationObserver(() => applyStylesOnce());
+        observer.observe(document.body, { childList: true, subtree: true });
+    })();
+    </script>
+    """,
+    unsafe_allow_html=True,
+)
 
 uploaded_file = st.file_uploader("Upload light curve CSV", type=["csv"])
 
@@ -114,6 +182,7 @@ if uploaded_file is not None:
         st.success(label)
     else:
         st.error(label)
+
 
 
 
