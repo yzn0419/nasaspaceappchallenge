@@ -5,7 +5,32 @@ import tensorflow as tf
 import matplotlib.pyplot as plt
 from tensorflow.keras.models import load_model
 from exoplanet import normalize, pad_or_trim  # reuse functions from exoplanet.py
+import streamlit as st
+import base64
 
+# Function to convert image to base64
+def get_base64(bin_file):
+    with open(bin_file, "rb") as f:
+        return base64.b64encode(f.read()).decode()
+
+# Function to set custom background
+def set_background(image_file):
+    bin_str = get_base64(image_file)
+    page_bg_img = f"""
+    <style>
+    .stApp {{
+        background-image: url("data:image/jpg;base64,{bin_str}");
+        background-size: cover;
+        color: white;
+    }}
+    h1, h2, h3, h4, h5, h6, p, div, span {{
+        color: white !important;
+    }}
+    </style>
+    """
+    st.markdown(page_bg_img, unsafe_allow_html=True)
+
+# Call it here (make sure the file exists in the repo!)
 set_background("Untitled design.jpg")
 
 # Load pre-trained model
@@ -83,6 +108,7 @@ if uploaded_file is not None:
         st.success(label)
     else:
         st.error(label)
+
 
 
 
