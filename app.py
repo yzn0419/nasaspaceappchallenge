@@ -16,6 +16,11 @@ st.markdown(
         color: white !important;
     }
 
+/* File uploader box styling */
+    .stFileUploader > div {
+        background-color: black !important;
+        border: 2px dashed white !important;
+        color: white !important;
     /* Also fix buttons and inputs so text stays visible */
     .stButton>button {
         color: black !important;
@@ -79,6 +84,7 @@ if uploaded_file is not None:
     st.subheader("Prediction")
     st.write(f"Confidence: {pred:.3f}")
     st.success(label if pred > 0.5 else label)
+
 
 
 
