@@ -37,9 +37,9 @@ st.markdown(
     """
     <style>
     /* Force all text to white */
-    .stApp, .stMarkdown, .stText, .stTitle, .stHeader, .stSubheader,
+    .stApp, .stMarkdown, .stText, .stTitle, .stHeader, .stSubheader,.stCaption, 
      div, span, p {
-        color: white !important;
+        color: black !important;
     }
 
      <style>
@@ -137,6 +137,7 @@ if uploaded_file is not None:
         st.success(label)
     else:
         st.error(label)
+
 
 
 
