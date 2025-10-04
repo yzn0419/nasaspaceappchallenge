@@ -33,19 +33,19 @@ def set_background(image_file):
 # Call it here (make sure the file exists in the repo!)
 set_background("Untitled design (1).jpg")
 
+# Style text
 st.markdown(
     """
     <style>
-    /* Force all text to white */
-    .stApp, .stText, .stTitle, .stHeader, .stSubheader,.stCaption, 
-     div, span, p {
-        color: black !important;
-    }
-
-     <style>
-    .stwrite {
+    h1, h2, h3, h4, h5, h6 {
         color: white !important;
-
+    }
+    .stMarkdown p {
+        color: white !important;
+    }
+    .stCaption {
+        color: white !important;
+    }
     </style>
     """,
     unsafe_allow_html=True
@@ -126,6 +126,7 @@ if uploaded_file is not None:
         st.success(label)
     else:
         st.error(label)
+
 
 
 
