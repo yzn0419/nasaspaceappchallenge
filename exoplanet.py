@@ -7,10 +7,6 @@ import tensorflow as tf
 from tensorflow.keras import layers, models, callbacks, optimizers
 from sklearn.model_selection import train_test_split
 
-# ---------------------------
-#  Data loading utilities
-# ---------------------------
-
 def load_from_csv_folder(folder, seq_len=2048):
     """
     Expect CSVs with columns: time, flux, flux_err (optional), label (0/1 optional)
@@ -71,11 +67,6 @@ def _pad_or_trim(arr, length):
         pad_val = np.nanmedian(arr) if len(arr)>0 else 0.0
         return np.pad(arr, (left, right), 'constant', constant_values=(pad_val, pad_val))
 
-
-# ---------------------------
-#  Preprocessing
-# ---------------------------
-
 def normalize_flux(X):
     """
     Normalize per-sample: (flux - median) / std
@@ -90,20 +81,14 @@ def normalize_flux(X):
     return X_norm
 
 def detrend_placeholder(X):
-    """
-    Placeholder for detrending (e.g., Savitzky-Golay, spline). For now do nothing.
-    Replace with real detrend for mission data.
-    """
+
     return X
 
-#
+
 def phase_fold_placeholder(X, period, time_array=None):
     raise NotImplementedError("Implement folding when you have time & period info.")
 
 
-# ---------------------------
-#  Model
-# ---------------------------
 
 def build_cnn_model(input_length=2048, channels=1, dropout_rate=0.3):
     inp = layers.Input(shape=(input_length, channels))
@@ -123,9 +108,6 @@ def build_cnn_model(input_length=2048, channels=1, dropout_rate=0.3):
     return model
 
 
-# ---------------------------
-#  Training / evaluation
-# ---------------------------
 
 def train_model(model, X_train, y_train, X_val, y_val, out_dir='models', epochs=20, batch_size=32):
     os.makedirs(out_dir, exist_ok=True)
@@ -146,14 +128,7 @@ def evaluate_model(model, X_test, y_test):
     return results
 
 
-# ---------------------------
-#  Utilities: synthetic data
-# ---------------------------
-
 def make_synthetic_dataset(n_samples=1024, seq_len=2048, transit_depth=0.01, transit_width=10, random_seed=0):
-    """
-    Create a tiny synthetic dataset with simple box transits for testing.
-    Label 1 = transit present, 0 = none.
     """
     rng = np.random.RandomState(random_seed)
     X = np.zeros((n_samples, seq_len), dtype=np.float32)
@@ -170,9 +145,6 @@ def make_synthetic_dataset(n_samples=1024, seq_len=2048, transit_depth=0.01, tra
     X = X[..., np.newaxis]
     return X, y
 
-# ---------------------------
-#  Example main
-# ---------------------------
 
 def main_smoke_test():
     print("Building synthetic dataset...")
@@ -201,4 +173,5 @@ pad_or_trim = _pad_or_trim
 
 if __name__ == "__main__":
     main_smoke_test()
+
 
