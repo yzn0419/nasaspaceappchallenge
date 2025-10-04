@@ -40,39 +40,158 @@ model = load_model(MODEL_PATH)
 st.title("🌌 Exovision")
 st.write("Upload a light curve file (CSV with time + flux columns) to detect possible exoplanet transits.")
 
-# --- Custom styled uploader ---
-st.markdown("""
+# ---------- CUSTOM STYLED Uploader (keeps st.file_uploader backend) ----------
+st.markdown(
+    """
     <style>
-    /* Style the drag-and-drop area */
-    [data-testid="stFileUploader"] section {{
-        background-color: #001f3f !important;  /* dark blue */
-        color: white !important;
-        border: 2px dashed #004080 !important;
-        border-radius: 10px !important;
-        padding: 20px;
-    }}
-
-    /* Caption (inside uploader) */
-    [data-testid="stFileUploader"] section div {{
-        color: white !important;
-    }}
-
-    /* "Browse files" button */
-    [data-testid="stFileUploader"] button {{
-        background-color: #003366 !important;
-        color: white !important;
-        border: none !important;
-        border-radius: 6px !important;
-    }}
-
-    [data-testid="stFileUploader"] button:hover {{
-        background-color: #004080 !important;
-        color: #e0e0e0 !important;
-    }}
+    /* Visual custom uploader box */
+    #custom-uploader {
+        background-color: #0b274a;
+        border: 3px dashed #4fc3f7;
+        border-radius: 12px;
+        padding: 36px;
+        text-align: center;
+        color: white;
+        font-family: "Poppins", sans-serif;
+        margin-bottom: 12px;
+        cursor: pointer;
+        user-select: none;
+    }
+    #custom-uploader h3 { margin: 0 0 6px 0; }
+    #custom-uploader p { margin: 0; color: white; font-size: 14px; }
+    /* Small visual highlight on dragover */
+    #custom-uploader.dragover {
+        background-color: #133b73;
+        transform: scale(1.01);
+    }
+    /* Hide the default uploader visuals (we keep the input element in DOM) */
+    div[data-testid="stFileUploaderDropzone"] {
+        opacity: 0;
+        height: 1px;  /* keep it in DOM but visually tiny */
+        overflow: hidden;
+        position: relative;
+    }
     </style>
-""", unsafe_allow_html=True)
 
+    <div id="custom-uploader" aria-hidden="true">
+      <h3>📤 Drag & Drop CSV here</h3>
+      <p>or click to browse — (CSV with time + flux columns)</p>
+    </div>
+
+    <script>
+    (function() {
+        console.log("[custom-uploader] init script running");
+
+        // Attempts to find the Streamlit file input element that accepts .csv
+        function findStreamlitFileInput() {
+            const inputs = Array.from(document.querySelectorAll('input[type="file"]'));
+            if (!inputs.length) return null;
+            // prefer the input that accepts .csv (some Streamlit inputs might accept other types)
+            for (const inp of inputs) {
+                try {
+                    const accept = inp.getAttribute('accept') || "";
+                    if (accept.includes('.csv') || accept.includes('text/csv')) return inp;
+                } catch(e){}
+            }
+            // fallback: return first file input
+            return inputs[0] || null;
+        }
+
+        function attachForwarding() {
+            const box = document.getElementById('custom-uploader');
+            if (!box) { console.log("[custom-uploader] box not found"); return false; }
+
+            const input = findStreamlitFileInput();
+            if (!input) { console.log("[custom-uploader] file input not found yet"); return false; }
+
+            console.log("[custom-uploader] found file input:", input);
+
+            // Make sure input is not display:none; keep it tiny and invisible (we already set CSS)
+            input.style.opacity = 0;
+            input.style.position = 'relative';
+            input.style.zIndex = 1;
+
+            // Click forwards to native input
+            box.addEventListener('click', function() {
+                console.log("[custom-uploader] box clicked -> opening native file dialog");
+                try { input.click(); } catch (e) { console.warn("[custom-uploader] input.click() failed", e); }
+            });
+
+            // Drag events: visual feedback
+            box.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                box.classList.add('dragover');
+            });
+            box.addEventListener('dragleave', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                box.classList.remove('dragover');
+            });
+
+            // Drop forwarding: set the native input.files via DataTransfer, then dispatch change
+            box.addEventListener('drop', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                box.classList.remove('dragover');
+                const files = e.dataTransfer.files;
+                if (!files || files.length === 0) {
+                    console.log("[custom-uploader] no files dropped");
+                    return;
+                }
+                try {
+                    const dt = new DataTransfer();
+                    for (let i = 0; i < files.length; i++) {
+                        dt.items.add(files[i]);
+                    }
+                    input.files = dt.files;
+
+                    // dispatch change event on input so Streamlit picks it up
+                    const evt = new Event('change', { bubbles: true });
+                    input.dispatchEvent(evt);
+                    console.log("[custom-uploader] forwarded drop to native input (files set, change dispatched)");
+                } catch (err) {
+                    console.warn("[custom-uploader] error forwarding dropped files:", err);
+                }
+            });
+
+            // Also forward native input changes to give visual feedback in console
+            input.addEventListener('change', () => {
+                console.log("[custom-uploader] native input change event fired, files:", input.files);
+            });
+
+            return true;
+        }
+
+        // Retry loop (Streamlit renders components asynchronously)
+        let tries = 0;
+        const maxTries = 40;
+        const interval = setInterval(() => {
+            tries++;
+            const ok = attachForwarding();
+            if (ok || tries > maxTries) {
+                clearInterval(interval);
+                if (!ok) console.warn("[custom-uploader] Giving up after", tries, "attempts");
+            }
+        }, 250);
+
+        // Also observe DOM mutations to re-run attach when new nodes appear
+        const observer = new MutationObserver((mutations) => {
+            // tiny debounce
+            setTimeout(() => attachForwarding(), 120);
+        });
+        observer.observe(document.body, { childList: true, subtree: true });
+
+    })();
+    </script>
+    """,
+    unsafe_allow_html=True
+)
+
+# now call the real uploader (kept for Streamlit backend). It will be hidden visually but present in DOM:
 uploaded_file = st.file_uploader("Upload light curve CSV", type=["csv"])
+# -------------------------------------------------------------------------
+
 
 # --- File processing logic ---
 if uploaded_file is not None:
@@ -137,6 +256,7 @@ if uploaded_file is not None:
         st.success(label)
     else:
         st.error(label)
+
 
 
 
