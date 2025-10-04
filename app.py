@@ -39,7 +39,7 @@ st.markdown(
     /* Force all text to white */
     .stApp, .stMarkdown, .stText, .stTitle, .stHeader, .stSubheader,
     .stCaption, div, span, p {
-        color: black !important;
+        color: white !important;
     }
 
     /* File uploader box styling */
@@ -133,6 +133,7 @@ if uploaded_file is not None:
         st.success(label)
     else:
         st.error(label)
+
 
 
 
