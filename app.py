@@ -17,7 +17,7 @@ st.markdown(
     }
 
   /* File uploader box */
-    section[data-testid="stFileUploader"] div[role="button"] {
+    section[data-testid="st.file_uploader"] div[role="button"] {
         background-color: black !important;
         border: 2px dashed white !important;
         color: white !important;
@@ -81,6 +81,7 @@ if uploaded_file is not None:
     st.subheader("Prediction")
     st.write(f"Confidence: {pred:.3f}")
     st.success(label if pred > 0.5 else label)
+
 
 
 
