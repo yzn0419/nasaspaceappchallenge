@@ -12,9 +12,9 @@ st.markdown(
     """
     <style>
     /* Force all text to white */
-    .stApp, .stMarkdown, .stText, .stTitle, .stHeader, .stSubheader,
+    .stApp, .stMarkdown, .stText, .stHeader,
     .stCaption, div, span, p {
-        color: white !important;
+        color: black !important;
     }
 
     /* File uploader box styling */
@@ -84,6 +84,7 @@ if uploaded_file is not None:
     st.subheader("Prediction")
     st.write(f"Confidence: {pred:.3f}")
     st.success(label if pred > 0.5 else label)
+
 
 
 
