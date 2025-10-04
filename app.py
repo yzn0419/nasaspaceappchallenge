@@ -5,20 +5,32 @@ import tensorflow as tf
 from tensorflow.keras.models import load_model
 from exoplanet import normalize, pad_or_trim  # reuse functions from exoplanet.py
 import base64
-
 import streamlit as st
 
-# Inject CSS for white text
+# Force all text to white without changing background
 st.markdown(
     """
     <style>
-        body, .stMarkdown, .stText, .stTitle, .stHeader, .stSubheader, .stCaption {
-            color: white !important;
-        }
+    .stApp, .stMarkdown, .stText, .stTitle, .stHeader, .stSubheader,
+    .stCaption, .stDataFrame, div, span, p {
+        color: white !important;
+    }
+
+    /* Also fix buttons and inputs so text stays visible */
+    .stButton>button {
+        color: white !important;
+    }
+    input, textarea {
+        color: white !important;
+    }
     </style>
     """,
     unsafe_allow_html=True
 )
+
+# Example UI
+st.title("🌌 Exoplanet Detector")
+st.write("Now the text is white, but the background stays the same.")
 
 st.title("🚀 Exoplanet Detector by ASID Robotics")
 st.write("Upload a light curve file to detect possible exoplanet transits.")
@@ -74,6 +86,7 @@ if uploaded_file is not None:
     st.subheader("Prediction")
     st.write(f"Confidence: {pred:.3f}")
     st.success(label if pred > 0.5 else label)
+
 
 
 
