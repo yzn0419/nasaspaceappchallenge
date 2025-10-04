@@ -35,6 +35,13 @@ set_background("Untitled design (1).jpg")
 
 
 # Robust CSS + JS to style the Streamlit file-uploader dropzone dark blue
+
+
+
+# Load pre-trained model
+MODEL_PATH = "models/final_model.h5"
+model = load_model(MODEL_PATH)
+
 st.markdown(
     """
     <style>
@@ -111,11 +118,6 @@ st.markdown(
 )
 
 
-
-# Load pre-trained model
-MODEL_PATH = "models/final_model.h5"
-model = load_model(MODEL_PATH)
-
 st.title("🌌Exovision")
 st.write("Upload a light curve file (CSV with time + flux columns) to detect possible exoplanet transits.")
 
@@ -187,6 +189,7 @@ if uploaded_file is not None:
         st.success(label)
     else:
         st.error(label)
+
 
 
 
