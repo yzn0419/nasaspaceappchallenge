@@ -6,6 +6,22 @@ from tensorflow.keras.models import load_model
 from exoplanet import normalize, pad_or_trim  # reuse functions from exoplanet.py
 import base64
 
+import streamlit as st
+
+# Inject CSS for white text
+st.markdown(
+    """
+    <style>
+        body, .stMarkdown, .stText, .stTitle, .stHeader, .stSubheader, .stCaption {
+            color: white !important;
+        }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
+st.title("🚀 Exoplanet Detector by ASID Robotics")
+st.write("Upload a light curve file to detect possible exoplanet transits.")
 # ==== BACKGROUND SETUP ====
 def get_base64(bin_file):
     with open(bin_file, 'rb') as f:
@@ -58,6 +74,7 @@ if uploaded_file is not None:
     st.subheader("Prediction")
     st.write(f"Confidence: {pred:.3f}")
     st.success(label if pred > 0.5 else label)
+
 
 
 
