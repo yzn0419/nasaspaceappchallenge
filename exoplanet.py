@@ -4,7 +4,6 @@ import tensorflow as tf
 from tensorflow.keras import layers, models, callbacks, optimizers
 from sklearn.model_selection import train_test_split
 
-# For real data:
 import lightkurve as lk
 
 
@@ -65,11 +64,7 @@ def detrend_simple(X):
     # Here, do nothing (identity); replace with Savitzky–Golay or spline in real use
     return X
 
-# Optional: fold around period if you know it. Not used yet.
 
-# ----------------------------
-# Model definition
-# ----------------------------
 
 def build_cnn_model(input_length=2048, channels=1, dropout_rate=0.3):
     inp = layers.Input(shape=(input_length, channels))
@@ -90,9 +85,7 @@ def build_cnn_model(input_length=2048, channels=1, dropout_rate=0.3):
     )
     return model
 
-# ----------------------------
-# Training / evaluation
-# ----------------------------
+
 
 def train_model(model, X_train, y_train, X_val, y_val, out_dir="models", epochs=10, batch_size=16):
     os.makedirs(out_dir, exist_ok=True)
@@ -113,13 +106,11 @@ def evaluate_model(model, X_test, y_test):
     print("Test results:", res)
     return res
 
-# ----------------------------
-# Example usage
-# ----------------------------
+
 
 def main():
-    # 1. Optionally fetch real data
-    target = "TIC 25155310"  # example TESS target (you can swap this)
+    
+    target = 
     print("Fetching real light curve for target:", target)
     try:
         X_real, y_real, time_arr = fetch_lightcurve(target, mission="TESS", seq_len=2048)
@@ -128,7 +119,7 @@ def main():
         print("Could not fetch real data:", e)
         X_real, y_real = None, None
 
-    # 2. Synthetic dataset for fallback / mixing
+   
     n_samples = 256
     seq_len = 2048
     X_syn = np.zeros((n_samples, seq_len, 1), dtype=np.float32)
@@ -144,9 +135,9 @@ def main():
     X_syn = detrend_simple(X_syn)
     X_syn = normalize(X_syn)
 
-    # 3. Optionally combine real + synthetic or just use synthetic for initial training
+    
     if X_real is not None:
-        # You might want to expand real data (e.g. via random cropping, injection)
+        
         X = np.concatenate([X_syn, X_real], axis=0)
         y = np.concatenate([y_syn, y_real], axis=0)
     else:
@@ -156,22 +147,23 @@ def main():
     X_train, X_temp, y_train, y_temp = train_test_split(X, y, test_size=0.3, random_state=42, stratify=y)
     X_val, X_test, y_val, y_test = train_test_split(X_temp, y_temp, test_size=0.5, random_state=42, stratify=y_temp)
 
-    # 4. Build model
+
     model = build_cnn_model(input_length=seq_len, channels=1)
     model.summary()
 
-    # 5. Train
+
     train_model(model, X_train, y_train, X_val, y_val, epochs=5, batch_size=16)
 
-    # 6. Evaluate
+   
     evaluate_model(model, X_test, y_test)
 
-    # 7. Save entire model
+    
     model.save("models/final_model_with_real.h5")
     print("Saved model to models/final_model_with_real.h5")
 
 if __name__ == "__main__":
     main()
+
 
 
 
