@@ -32,6 +32,30 @@ def set_background(image_file):
 # Set page background
 set_background("Untitled design (5).jpg")
 
+st.markdown(
+    """
+    <style>
+    /* Set all text to black */
+    html, body, .stApp, .stMarkdown, .stHeader, .stCaption, p, span, div {
+        color: black !important;
+    }
+
+    /* Style the file uploader box */
+    .stFileUploader > div {
+        background-color: black !important;
+        border: 2px dashed black !important;
+    }
+
+    /* Style the file uploader label text */
+    .stFileUploader label {
+        color: black !important;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
+
 # Load model
 MODEL_PATH = "models/final_model.h5"
 model = load_model(MODEL_PATH)
@@ -109,6 +133,7 @@ if uploaded_file is not None:
         st.success(label)
     else:
         st.error(label)
+
 
 
 
