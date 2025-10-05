@@ -30,7 +30,7 @@ def set_background(image_file):
     st.markdown(page_bg_img, unsafe_allow_html=True)
 
 # Set page background
-set_background("Untitled design (5).jpg")
+set_background("Untitled design (6).jpg")
 
 st.markdown(
     """
@@ -133,6 +133,7 @@ if uploaded_file is not None:
         st.success(label)
     else:
         st.error(label)
+
 
 
 
