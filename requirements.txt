@@ -4,5 +4,7 @@ numpy
 plotly
 tensorflow
 lightkurve
+exoplanet
 astropy
+
 
