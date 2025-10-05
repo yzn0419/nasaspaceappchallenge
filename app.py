@@ -4,7 +4,8 @@ import pandas as pd
 import tensorflow as tf
 import matplotlib.pyplot as plt
 from tensorflow.keras.models import load_model
-from exoplanet import normalize, pad_or_trim  
+from exoplanet import normalize, pad_or_trim  # from exoplanet import normalize, pad_or_trim
+
 import base64
 
 
@@ -131,6 +132,7 @@ if uploaded_file is not None:
         st.success(label)
     else:
         st.error(label)
+
 
 
 
